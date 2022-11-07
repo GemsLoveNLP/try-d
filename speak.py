@@ -16,3 +16,17 @@ def f(result):
         text_string = (f'"{result.text}"')
         speech_synthesizer.speak_text_async(result.text)
         return text_string
+
+def num_extract(s):
+    num = []
+    ope = []
+    for i in s:
+        if i in "0123456789":
+            num.append(i)
+        elif i in "+-*/":
+            ope.append(i)
+    if len(ope) + 1 == len(num):
+        eq = [num[i] + " " + ope[i] for i in range(len(ope))]+[num[-1]]
+        value = eval(" ".join(eq))
+        return f'"{" ".join(eq)} equals {value}"'
+    return s
