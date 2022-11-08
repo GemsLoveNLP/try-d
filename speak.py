@@ -1,4 +1,5 @@
 import azure.cognitiveservices.speech as speechsdk
+import nltk
 
 Speech_key = "3b66785c9d73403b99708544933c45a2"
 Region = "southeastasia"
@@ -20,13 +21,48 @@ def f(result):
 def num_extract(s):
     num = []
     ope = []
-    for i in s:
-        if i in "0123456789":
+    #rid the " " sign
+    s = s[1:-1]
+    #destroy the punctuations
+    if s[-1] in ".,?":
+        s = s[:-1]
+    #create the number and operand lists
+    for i in s.split():
+        if i.isnumeric():
             num.append(i)
         elif i in "+-*/":
             ope.append(i)
+    #check if it is executable
     if len(ope) + 1 == len(num):
+        #form the source code and evaluate
         eq = [num[i] + " " + ope[i] for i in range(len(ope))]+[num[-1]]
         value = eval(" ".join(eq))
-        return f'"{" ".join(eq)} equals {value}"'
-    return s
+        #output
+        ans = f'"{" ".join(eq)} equals {value}"'
+        speech_synthesizer.speak_text_async(ans)
+        return ans
+    return ""
+
+#print(num_extract("Can you do like 2 + 2 + 15?"))
+
+def num_extract2(s):
+    tokens = nltk.word_tokenize(s)
+    num = []
+    ope = []
+    for i in tokens:
+        if i.isnumeric():
+            num.append(i)
+        elif i in "+-*/":
+            ope.append(i)
+    #check if it is executable
+    if len(ope) + 1 == len(num):
+        #form the source code and evaluate
+        eq = [num[i] + " " + ope[i] for i in range(len(ope))]+[num[-1]]
+        value = eval(" ".join(eq))
+        #output
+        ans = f'"{" ".join(eq)} equals {value}"'
+        speech_synthesizer.speak_text_async(ans)
+        return ans
+    return tokens
+
+print(num_extract2("'Can you do like 2 + 2 + 15?'"))
